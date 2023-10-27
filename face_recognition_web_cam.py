@@ -3,25 +3,28 @@ import cv2
 import numpy as np
 from recognition_knn import RecognitionKNN
 from emotion_detector import EmotionDetector
+from logger import Logger
+
 
 class FaceRecognitionWebCam:
     def __init__(self) -> None:
         self.device_index = 0
         self.video_capture = cv2.VideoCapture(self.device_index)
         self.emotion_detector = EmotionDetector()
+        self.running = True
 
     def run(self):
         process_this_frame = True
         predict_result = []  # name and location (name, ())
         predict_emotions = []
-        while True:
+        while self.running:
             ret, frame = self.video_capture.read()
 
             if process_this_frame:
                 predict_result = self._predict_by_KNN(frame)
                 predict_emotions = self.emotion_detector.detect_emotions(frame)
-                print(f"11111111111111111 {predict_emotions}")
-                print(f"22222222222, {predict_result}")
+                Logger.debug(f"Predict emotinos: {predict_emotions}")
+                Logger.debug(f"Prefict faces, {predict_result}")
 
             process_this_frame = not process_this_frame
 
@@ -32,10 +35,16 @@ class FaceRecognitionWebCam:
 
             # Hit 'q' on the keyboard to quit!
             if cv2.waitKey(1) & 0xFF == ord('q'):
+                Logger.info("Click q to quit")
                 break
+        
+        self.video_capture.release()
+        cv2.destoryAllWindows()
+        Logger.debug("Exited face recognition program.")
 
     def stop(self):
-        pass
+        self.running = False
+        Logger.debug("Set running to False.")
   
 # [('Chong In Ng', (76, 225, 166, 135))]
     def _predict_by_KNN(self, frame):
@@ -85,6 +94,7 @@ class FaceRecognitionWebCam:
                 emotion_data = predict_emotions[index]['emotions']
                 name, score = list(emotion_data.items())[0]
                 emotion_name = f"{name.capitalize()}: {score}"
+            
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, emotion_name, (left + 6, bottom + 26), font, 1.0, (0, 255, 0), 1)
             index += 1
