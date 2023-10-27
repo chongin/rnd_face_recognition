@@ -3,9 +3,9 @@ from sklearn import neighbors
 import os
 import os.path
 import pickle
-from PIL import Image, ImageDraw, ImageFont
+import re
 import face_recognition
-from face_recognition.face_recognition_cli import image_files_in_folder
+
 
 
 class RecognitionKNN:
@@ -25,7 +25,9 @@ class RecognitionKNN:
             n_neighbors = int(round(math.sqrt(len(encodings))))
             print("Chose n_neighbors automatically:", n_neighbors)
                 
-        knn_clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, algorithm=knn_algo, weights='distance')
+        knn_clf = neighbors.KNeighborsClassifier(
+            n_neighbors=n_neighbors, algorithm=knn_algo, weights='distance'
+        )
         knn_clf.fit(encodings, names)
 
         self._save_model(knn_clf=knn_clf)
@@ -58,8 +60,9 @@ class RecognitionKNN:
         if self.knn_clf is None:
             self.knn_clf = self._load_model()
 
-        print(f"gggggggg {face_encodings}")
-        closest_distances = self.knn_clf.kneighbors(face_encodings, n_neighbors=n_neighbors)
+        closest_distances = self.knn_clf.kneighbors(
+            face_encodings, n_neighbors=n_neighbors
+        )
         are_matches = []
         for i in range(len(face_locations)):
             closest_distance = closest_distances[0][i][0]
@@ -84,8 +87,9 @@ class RecognitionKNN:
         for class_dir in os.listdir(self.train_dir):
             if not os.path.isdir(os.path.join(self.train_dir, class_dir)):
                 continue
-
-            for img_path in image_files_in_folder(os.path.join(self.train_dir, class_dir)):
+            
+            image_folder = os.path.join(self.train_dir, class_dir)
+            for img_path in self.get_image_files(image_folder):
                 image = face_recognition.load_image_file(img_path)
                 face_bounding_boxes = face_recognition.face_locations(image)
 
@@ -109,3 +113,13 @@ class RecognitionKNN:
         with open(model_path, 'rb') as f:
             knn_clf = pickle.load(f)
         return knn_clf
+    
+    def get_image_files(self, images_folder):
+        image_file_paths = []
+        files_in_folder = os.listdir(images_folder)
+        for file_name in files_in_folder:
+            if re.match(r'.*\.(jpg|jpeg|png)', file_name, flags=re.I):
+                full_path = os.path.join(images_folder, file_name)
+                image_file_paths.append(full_path)
+
+        return image_file_paths
