@@ -8,6 +8,7 @@ import face_recognition
 from logger import Logger
 import cv2
 import numpy as np
+import cvzone 
 
 class FaceRecognitionKNN:
     def __init__(self) -> None:
@@ -61,11 +62,10 @@ class FaceRecognitionKNN:
             right *= 4
             bottom *= 4
             left *= 4
-
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
             cv2.rectangle(frame, (left, top - 35), (right, top), (0, 0, 255), cv2.FILLED)
-            font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, name, (left + 6, top - 6), font, 1.0, (255, 255, 255), 1)
+            font = cv2.FONT_HERSHEY_PLAIN
+            cv2.putText(frame, name, (left + 6, top - 6), font, 1.0, (255, 255, 255), 2)
 
     def predict(self, img_path, distance_threshold=0.6):
         if not os.path.isfile(img_path) or os.path.splitext(img_path)[1][1:] not in self.allowed_extenstions:

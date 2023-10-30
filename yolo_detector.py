@@ -31,4 +31,5 @@ class YoloDetector:
             conf = math.ceil((box.conf[0] * 100)) / 100
             cls = int(box.cls[0])
 
-            cvzone.putTextRect(frame, f'{self.class_names[cls]} {conf}', (max(0, x1), max(35, y1)), scale=0.7, thickness=1)
+            cvzone.putTextRect(frame, f'{self.class_names[cls]} {conf}', (max(0, x1), max(35, y1)),
+                               scale=0.7, thickness=1, offset=3)
