@@ -8,16 +8,18 @@ import face_recognition
 from logger import Logger
 import cv2
 import numpy as np
-import cvzone 
+import cvzone
+from utils.util import Util
 
 class FaceRecognitionKNN:
     def __init__(self) -> None:
         self.allowed_extenstions = {'png', 'jpg', 'jpeg'}
-        self.train_dir = "./models"
-        self.model_save_folder = './trained_models'
+        current_directory = Util.get_current_directory_of_file(__file__)
+        self.train_dir = f"{current_directory}/models"
+        self.model_save_folder = f"{current_directory}/trained_models"
         self.model_name = 'trained_knn_model'
         self.knn_clf = None
-
+    
     def train_model(self, n_neighbors=None, knn_algo='ball_tree'):
         Logger.info(f"Start to train model: n_neighbors: {n_neighbors}, knn_algo: {knn_algo}")
         encoding_dict = self._load_encodings()

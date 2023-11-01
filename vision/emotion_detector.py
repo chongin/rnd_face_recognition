@@ -3,6 +3,7 @@ from fer.utils import draw_annotations
 import cv2
 import cvzone
 
+
 class EmotionSmoothing:
     def __init__(self, buffer_size=3) -> None:
         self.buffer_size = buffer_size

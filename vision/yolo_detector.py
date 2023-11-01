@@ -3,11 +3,13 @@ import cv2
 import cvzone
 import math
 from logger import  Logger
+from utils.util import Util
 
 
 class YoloDetector:
     def __init__(self):
-        self.model = YOLO('yolo_weights/yolov8l.pt')
+        current_directory = Util.get_current_directory_of_file(__file__)
+        self.model = YOLO(f"{current_directory}/yolo_weights/yolov8l.pt")
         self.class_names = self.model.names
 
     def detect_objects(self, frame):
