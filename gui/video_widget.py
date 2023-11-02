@@ -14,16 +14,16 @@ from vision_manager import VisionManager
 class VideoThread(QThread):
     image_updated_signal = Signal(QImage)
 
+    def set_vision_manager(self, vision_manger):
+        self.vision_manager = vision_manger
 
     def run(self):
         self.thread_active = True
         self.video_capture = cv2.VideoCapture(0)
-
-        self.vision_manager = VisionManager()
-
         while self.thread_active:
             ret, frame = self.video_capture.read()
-            self.vision_manager.excute_frame(frame)
+            if self.vision_manager:
+                self.vision_manager.excute_frame(frame)
             q_image = self.convert_cv_qt(frame)
 
             self.image_updated_signal.emit(q_image)
@@ -44,12 +44,12 @@ class VideoThread(QThread):
 class VideoWidget(QLabel):
     def __init__(self) -> None:
         super().__init__()
+        self.vision_manager = VisionManager()
         self.video_thread = VideoThread()
+        self.video_thread.set_vision_manager(self.vision_manager)
+
         self.video_thread.image_updated_signal.connect(self.update_image)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.max_scale_factor = 1.0
-        # self.setAlignment(Qt.AlignCenter)
-  
 
     def start(self):
         self.video_thread.start()
@@ -57,11 +57,19 @@ class VideoWidget(QLabel):
     def stop(self):
         self.video_thread.stop()
 
-    @Slot(QImage)
+    def enable_emotion_dectection(self, flag: bool) -> None:
+        self.vision_manager.enable_emotion_dectection(flag)
+
+    def enable_face_dectection(self, flag: bool) -> None:
+        self.vision_manager.enable_face_dectection(flag)
+
+    def enable_object_dectection(self, flag: bool) -> None:
+        self.vision_manager.enable_object_dectection(flag)
+
     def update_image(self, image):
         scaled_image = image.scaled(self.size(), Qt.KeepAspectRatio)
         #scaled_image = self.scale_image(image, self.size(), self.max_scale_factor)
-        self.setPixmap(QPixmap.fromImage(scaled_image))
+        self.setPixmap(QPixmap.fromImage(image))
 
     def scale_image(self, image, target_size, max_scale_factor):
         width_ratio = target_size.width() / image.width()
