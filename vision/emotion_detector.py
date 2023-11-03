@@ -38,15 +38,13 @@ class EmotionDetector:
             'None': "Emotion detection? I'm on vacation!"
         }
 
-    
     def predict_emotions(self, frame):
-        flip_frame = cv2.flip(frame, 1)
-        emotions = self.detetor.detect_emotions(flip_frame)
-        highest_emotions = self._select_highest_emotion(emotions)
-        return highest_emotions
+        emotions = self.detetor.detect_emotions(frame)
+        filter_emotions = self._filter_highest_emotion(emotions)
+        return filter_emotions
 
 # [{'box': [547, 103, 304, 370], 'emotions': {'angry': 0.22, 'disgust': 0.0, 'fear': 0.44, 'happy': 0.0, 'sad': 0.14, 'surprise': 0.0, 'neutral': 0.18}}]
-    def _select_highest_emotion(self, detect_emotions):
+    def _filter_highest_emotion(self, detect_emotions):
         for item in detect_emotions:
             emotions = item['emotions']
 
@@ -55,30 +53,39 @@ class EmotionDetector:
         return detect_emotions
 
     # [{'box': [547, 103, 304, 370], 'emotions': {'angry': 0.22, 'disgust': 0.0, 'fear': 0.44, 'happy': 0.0, 'sad': 0.14, 'surprise': 0.0, 'neutral': 0.18}}]
-    def draw_emotion_rectangle(self, frame, predict_result, predict_emotions) -> None:
- 
-        index = 0
-        for name, (top, right, bottom, left) in predict_result:
-            top *= 4
-            right *= 4
-            bottom *= 4
-            left *= 4
-
-            emotion_name = 'None'
-            if len(predict_emotions) <= index:
-                emotion_name = 'None'
-            else:
-                emotion_data = predict_emotions[index]['emotions']
-                name, score = list(emotion_data.items())[0]
-                emotion_name = f"{name.capitalize()}"
+    def draw_emotion_rectangle(self, frame, predict_emotions) -> None:
+        for predict_emotion in predict_emotions:
+            x, y, w, h = predict_emotion['box']
+            emotions = predict_emotion['emotions']
+            name, score = list(emotions.items())[0]
+            emotion_name = f"{name.capitalize()}"
 
             if self.enable_smoothing:
                 self.emotion_smoothing.add_emotion(emotion_name)
                 emotion_name = self.emotion_smoothing.get_smoothed_emotion()
-
+            
             emotion_hint = self.emotion_hints[emotion_name]
-            # font = cv2.FONT_HERSHEY_DUPLEX
-            # cv2.putText(frame, emotion_hint, (left + 6, bottom + 26), font, 1.0, (0, 255, 0), 1)
-            cvzone.putTextRect(frame, emotion_hint, (left + 6, bottom + 26), scale=1, thickness=1, colorR=(255, 0, 255),)
-            index += 1
-    
+            # cvzone.cornerRect(frame, (x, y, w, h))
+            cvzone.putTextRect(
+                frame,
+                emotion_hint,
+                (x + 2, y + h + 25),
+                scale=1,
+                thickness=1,
+                colorT=(255, 255, 255),
+                colorR=(255, 0, 255),
+            )
+
+            # cv2.putText(
+            #     frame,
+            #     emotion_hint,
+            #     (
+            #         x,
+            #         y + h + 15,
+            #     ),
+            #     cv2.FONT_HERSHEY_SIMPLEX,
+            #     0.5,
+            #     (0, 255, 0),
+            #     1,
+            #     cv2.LINE_AA,
+            # )

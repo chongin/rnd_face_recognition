@@ -22,10 +22,11 @@ class VideoThread(QThread):
         self.video_capture = cv2.VideoCapture(0)
         while self.thread_active:
             ret, frame = self.video_capture.read()
+            flip_frame = cv2.flip(frame, 1)
             if self.vision_manager:
-                self.vision_manager.excute_frame(frame)
-            q_image = self.convert_cv_qt(frame)
+                self.vision_manager.excute_frame(flip_frame)
 
+            q_image = self.convert_cv_qt(flip_frame)
             self.image_updated_signal.emit(q_image)
 
         self.video_capture.release()

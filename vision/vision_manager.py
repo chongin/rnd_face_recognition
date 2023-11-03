@@ -29,7 +29,7 @@ class VisionManager:
 
         if self.emotion_detection_flag:
             predict_emotions = self.emotion_detector.predict_emotions(frame=frame)
-            self.emotion_detector.draw_emotion_rectangle(frame, predict_result, predict_emotions)
+            self.emotion_detector.draw_emotion_rectangle(frame, predict_emotions)
 
         if self.object_detection_flag:
             detect_objects = self.yolo_detector.detect_objects(frame=frame)

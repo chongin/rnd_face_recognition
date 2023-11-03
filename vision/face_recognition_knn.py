@@ -64,10 +64,23 @@ class FaceRecognitionKNN:
             right *= 4
             bottom *= 4
             left *= 4
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-            cv2.rectangle(frame, (left, top - 35), (right, top), (0, 0, 255), cv2.FILLED)
-            font = cv2.FONT_HERSHEY_PLAIN
-            cv2.putText(frame, name, (left + 6, top - 6), font, 1.0, (255, 255, 255), 2)
+
+            width = right - left
+            height = bottom - top
+            cvzone.cornerRect(frame, (left, top, width, height))
+            cvzone.putTextRect(
+                frame,
+                name,
+                (left + 6, top - 12),
+                scale=1,
+                thickness=1,
+                colorT=(255, 255, 255),
+                colorR=(255, 0, 255),
+            )
+            # cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+            # # cv2.rectangle(frame, (left, top - 35), (right, top), (0, 0, 255), cv2.FILLED)
+            # font = cv2.FONT_HERSHEY_PLAIN
+            # cv2.putText(frame, name, (left + 6, top - 6), font, 1.0, (255, 255, 255), 2)
 
     def predict(self, img_path, distance_threshold=0.6):
         if not os.path.isfile(img_path) or os.path.splitext(img_path)[1][1:] not in self.allowed_extenstions:

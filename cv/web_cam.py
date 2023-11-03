@@ -26,10 +26,11 @@ class WebCam:
         while self.running:
             ret, frame = self.video_capture.read()
             if ret:
-                self.vision_manager.excute_frame(frame)
+                flip_frame = cv2.flip(frame, 1)
+                self.vision_manager.excute_frame(flip_frame)
 
                 # Display the resulting image
-                cv2.imshow('Video', frame)
+                cv2.imshow('Video', flip_frame)
 
                 # Hit 'q' on the keyboard to quit!
                 if cv2.waitKey(1) & 0xFF == ord('q'):

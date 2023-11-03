@@ -143,6 +143,7 @@ class MyMainWindow(QMainWindow):
         self.all_cb.update()
         self.all_cb.blockSignals(False)
 
+
 def main():
     app = QApplication(sys.argv)
     window = MyMainWindow()
