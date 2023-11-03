@@ -6,6 +6,8 @@ from PySide6.QtGui import *
 
 from video_widget import VideoWidget
 from action_checkbox import ActionCheckBox
+from voice_widget import VoiceWidget
+
 
 class MyMainWindow(QMainWindow):
     def __init__(self):
@@ -30,8 +32,8 @@ class MyMainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         self.dock_widget = QDockWidget("Snapshot View", self)
-        dock_text_edit = QTextEdit()
-        self.dock_widget.setWidget(dock_text_edit)
+        self.voice_widget = VoiceWidget()
+        self.dock_widget.setWidget(self.voice_widget)
         self.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
 
     def create_menu(self):
@@ -116,6 +118,10 @@ class MyMainWindow(QMainWindow):
     def voice_detection_toggle(self):
         print("voice_detection_toggle")
         self.update_all_checkbox_state()
+        if self.voice_cb.isChecked():
+            self.voice_widget.start()
+        else:
+            self.voice_widget.stop()
 
     def all_detection_toggle(self):
         all_checked = self.all_cb.isChecked()

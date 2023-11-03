@@ -16,10 +16,18 @@ class Configure:
         return cls._instance
     
     def auth_key(self):
-        return self.config['auth_key']
-
+        return self.secret['auth_key']
+    
+    def wsserver_url(self):
+        return self.config['wsserver_url']
+    
     def __init_manual__(self) -> None:
-        config_path = f"{self._get_current_directory_of_file(__file__)}/secret.json"
+        current_directory = self._get_current_directory_of_file(__file__)
+        secret_path = f"{current_directory}/secret.json"
+        with open(secret_path, 'r') as json_file:
+            self.secret = json.load(json_file)
+
+        config_path = f"{current_directory}/config.json"
         with open(config_path, 'r') as json_file:
             self.config = json.load(json_file)
 

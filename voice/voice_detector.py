@@ -1,89 +1,47 @@
 
-import pyaudio
-import websockets
-import asyncio
-import base64
-import json
-from configure import auth_key
-import pyttsx3
 from websocket_client import WebSocketClient
+from speech_to_text import SpeechToText
+import asyncio
+import threading
+from configure import Configure
 
-
-FRAMES_PER_BUFFER = 8192
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 16000
 
 class VoiceDetector:
     def __init__(self) -> None:
-        self.engine = pyttsx3.init()
-        p = pyaudio.PyAudio()
+        self.ws_cli = WebSocketClient(Configure.instance().wsserver_url())
+        self.speech_to_text = SpeechToText()
+        self.speech_to_text.set_callback(self.handle_callback)
+        self.speech_thread = None
+        self.running = False
+        self.callback = None
 
-        # starts recording
-        stream = p.open(
-            format=FORMAT,
-            channels=CHANNELS,
-            rate=RATE,
-            input=True,
-            frames_per_buffer=FRAMES_PER_BUFFER
+    def set_callback(self, callback):
+        self.callback = callback
+
+    def _run_in_event_loop(self):
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.speech_to_text.run())
+        print("exit event loop................")
+
+    def run(self):
+        self.speech_thread = threading.Thread(
+            target=self._run_in_event_loop, args=()
         )
+        self.speech_thread.start()
+        self.running = True
+        self.speech_thread.join()
 
-        # the AssemblyAI endpoint we're going to hit
-        URL = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
-        self.wsclient = WebSocketClient("ws://localhost:8765")
+    async def handle_callback(self, text: str) -> None:
+        print(f"{text}")
+        if self.callback:
+            self.callback(text)
 
-    async def send_receive():
-        print(f'Connecting websocket to url ${URL}')
-        async with websockets.connect(
-                URL,
-                extra_headers=(("Authorization", auth_key),),
-                ping_interval=5,
-                ping_timeout=20
-        ) as _ws:
-            await wsclient.connect()
-            await asyncio.sleep(0.1)
-            print("Receiving SessionBegins ...")
-            session_begins = await _ws.recv()
-            print(session_begins)
-            print("Sending messages ...")
+    def stop(self) -> None:
+        self.speech_to_text.stop()
+        print("Thread has111111111 stopped")
 
-            async def send():
-                while True:
-                    try:
-                        data = stream.read(FRAMES_PER_BUFFER)
-                        data = base64.b64encode(data).decode("utf-8")
-                        json_data = json.dumps({"audio_data": str(data)})
-                        await _ws.send(json_data)
-                    except websockets.exceptions.ConnectionClosedError as e:
-                        print(e)
-                        assert e.code == 4008
-                        break
-                    except Exception as e:
-                        assert False, "Not a websocket 4008 error"
-                    await asyncio.sleep(0.01)
 
-                return True
-
-            async def receive():
-                while True:
-                    try:
-                        result_str = await _ws.recv()
-                        json_result = json.loads(result_str)
-                        if json_result['message_type'] == 'FinalTranscript':
-                            print(json_result['text'])
-                            await wsclient.send_message({
-                                'name': 'Text',
-                                'text': json_result['text']
-                            })
-
-                    except websockets.exceptions.ConnectionClosedError as e:
-                        print(e)
-                        assert e.code == 4008
-                        break
-                    except Exception as e:
-                        assert False, "Not a websocket 4008 error"
-
-            async def receive_message():
-                await wsclient.receive_message()
-
-            await asyncio.gather(send(), receive(), receive_message())
+if __name__ == "__main__":
+    voice_detector = VoiceDetector()
+    voice_detector.run()

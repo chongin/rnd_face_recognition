@@ -6,9 +6,7 @@ import cv2
 import sys
 import os
 
-# Add the parent directory (src) to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../vision')))
-
 from vision_manager import VisionManager
 
 class VideoThread(QThread):
