@@ -1,11 +1,12 @@
 import pyaudio
-import websockets
-import asyncio
 import base64
 import json
 from configure import Configure
 import pyttsx3
 import threading
+
+
+from ws_client import WSClient
 
 FRAMES_PER_BUFFER = 8192
 FORMAT = pyaudio.paInt16
@@ -21,14 +22,26 @@ class SpeechToText:
         self.auth_key = Configure.instance().auth_key()
         self.running = True
         self.callback = None
-        self._ws = None
+        self._ws_cli = WSClient(self.URL, header={"Authorization": self.auth_key})
+        self._ws_cli.set_handle_message_cb(self.handle_message)
+
+    def handle_message(self, message):
+        json_result = json.loads(message)
+        if json_result['message_type'] != 'FinalTranscript':
+            return
+        
+        final_script = json_result['text']
+        if self.callback:
+            self.callback(final_script)
+        else:
+            print(f"speech to text recieved: {final_script}")
 
     def set_callback(self, callback):
         self.callback = callback
     
-    def _start_recording(self):
-        p = pyaudio.PyAudio()
-        self.stream = p.open(
+    def _open_audio(self):
+        self.p_audio = pyaudio.PyAudio()
+        self.stream = self.p_audio.open(
             format=FORMAT,
             channels=CHANNELS,
             rate=RATE,
@@ -36,88 +49,40 @@ class SpeechToText:
             frames_per_buffer=FRAMES_PER_BUFFER
         )
 
-    def _stop_recording(self):
+    def _close_audio(self):
+        self.stream.stop_stream()
         self.stream.close()
         self.stream = None
+        self.p_audio.terminate()
 
-    async def connect(self):
-        self._ws = await websockets.connect(
-            self.URL,
-            extra_headers=(("Authorization", self.auth_key),),
-            ping_interval=5,
-            ping_timeout=20
-        )
-        await asyncio.sleep(0.1)
-        print("Receiving SessionBegins ...")
-        session_begins = await self._ws.recv()
-        print(session_begins)
-        print("Sending messages ...")
-
-    async def disconnect(self):
-        if self._ws:
-            await self._ws.close()
-            self._ws = None
-
-    async def send(self):
-        while self.running:
-            try:
-                data = self.stream.read(FRAMES_PER_BUFFER)
-                data = base64.b64encode(data).decode("utf-8")
-                json_data = json.dumps({"audio_data": str(data)})
-                await self._ws.send(json_data)
-            except websockets.exceptions.ConnectionClosedError as e:
-                print(e)
-                assert e.code == 4008
-                break
-            except Exception as e:
-                assert False, f"Not a websocket 4008 error: {str(e)}"
-            await asyncio.sleep(0.01)
-
-        return True
-
-    async def receive(self):
-        while self.running:
-            try:
-                result_str = await self._ws.recv()
-                json_result = json.loads(result_str)
-                if json_result['message_type'] == 'FinalTranscript':
-                    print(json_result['text'])
-                    if self.callback:
-                        await self.callback(json_result['text'])
-            except websockets.exceptions.ConnectionClosedError as e:
-                print(e)
-                assert e.code == 4008
-                break
-            except Exception as e:
-                assert False, f"Not a websocket 4008 error: {str(e)}"
+    def read_data_from_audio(self):
+        data = self.stream.read(FRAMES_PER_BUFFER)
+        data = base64.b64encode(data).decode("utf-8")
+        json_data = json.dumps({"audio_data": str(data)})
+        return json_data
     
-    async def run(self):
+    def run(self):
         self.running = True
-        await self.connect()
-        self._start_recording()
-        await asyncio.gather(self.send(), self.receive())
+        self._open_audio()
+        self.text_thread = threading.Thread(target=self._ws_cli.run)
+        self.text_thread.start()
+        print("Start Listening.......")
+        while self.running:
+            try:
+                json_data = self.read_data_from_audio()
+                self._ws_cli.send_message(json_data)
+            except Exception as e:
+                print(f"while running speech to text, got a exception: {str(e)}")
+                break
+        print("End speech to text loop...")
+    
+    def stop(self):
+        try:
+            self.running = False
+            # self._close_audio()
+            self._ws_cli.manual_close()
+            self.text_thread.join()
+            print("Stop success.")
 
-    async def stop(self):
-        self.running = False
-        await self.disconnect()
-        self._stop_recording()
-
-    def set_running(self, flag: bool):
-        self.running = flag
-        print(f"after set running: {self.running}")
-        
-def print_callback(text):
-    print("Recognized Text:", text)
-
-def run_speech_to_text(stt):
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(stt.run())
-
-if __name__ == "__main__":
-    stt = SpeechToText()
-    stt.set_callback(print_callback)
-
-    thread = threading.Thread(target=run_speech_to_text, args=(stt,))
-    thread.start()
-    thread.join()
+        except Exception as e:
+            print(f"Stop speech to text got a exception: {str(e)}")

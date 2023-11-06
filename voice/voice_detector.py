@@ -4,44 +4,58 @@ from speech_to_text import SpeechToText
 import asyncio
 import threading
 from configure import Configure
+import time
+from ws_client import WSClient
 
 
 class VoiceDetector:
     def __init__(self) -> None:
-        self.ws_cli = WebSocketClient(Configure.instance().wsserver_url())
         self.speech_to_text = SpeechToText()
-        self.speech_to_text.set_callback(self.handle_callback)
-        self.speech_thread = None
-        self.running = False
+        self.speech_to_text.set_callback(self.handle_text_from_speech)
+
         self.callback = None
+        self.text_to_speech_cli = WSClient(Configure.instance().wsserver_url())
+        self.text_to_speech_cli.set_handle_message_cb(self.handle_message_from_server)
 
     def set_callback(self, callback):
         self.callback = callback
 
-    def _run_in_event_loop(self):
-        asyncio.set_event_loop(asyncio.new_event_loop())
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.speech_to_text.run())
-        print("exit event loop................")
+    def run_loop(self):
+        self.speech_to_text.run()
 
-    def run(self):
-        self.speech_thread = threading.Thread(
-            target=self._run_in_event_loop, args=()
-        )
-        self.speech_thread.start()
-        self.running = True
-        self.speech_thread.join()
+    def stop(self):
+        self.speech_to_text.stop()
 
-    async def handle_callback(self, text: str) -> None:
-        print(f"{text}")
+    def handle_text_from_speech(self, text: str) -> None:
         if self.callback:
             self.callback(text)
+        else:
+            print(f"Recognize: {text}")
 
-    def stop(self) -> None:
-        self.speech_to_text.stop()
-        print("Thread has111111111 stopped")
+        try:
+            self.text_to_speech_cli.send_message(text)
+        except Exception as e:
+            print(f"Handle text from speech error: str{e}")
+
+    def handle_message_from_server(self, text: str):
+        if self.callback:
+            self.callback(text)
+        else:
+            print(f"From server: {text}")
 
 
 if __name__ == "__main__":
     voice_detector = VoiceDetector()
-    voice_detector.run()
+    speech_thread = threading.Thread(
+        target=voice_detector.run_loop, args=()
+    )
+
+    speech_thread.start()
+    t1 = threading.Thread(target=voice_detector.speech_to_text.stop)
+    time.sleep(15)
+    t1.start()
+
+    speech_thread.join()
+    print("End speech running thread......")
+    t1.join()
+    print("End stop speech thread......")
