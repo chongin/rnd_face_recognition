@@ -3,8 +3,6 @@ from PySide6.QtCore import *
 
 import sys
 import os
-import threading
-import asyncio
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../voice')))

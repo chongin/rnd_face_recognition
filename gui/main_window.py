@@ -7,7 +7,7 @@ from PySide6.QtGui import *
 from video_widget import VideoWidget
 from action_checkbox import ActionCheckBox
 from voice_widget import VoiceWidget
-
+from snapshot_widget import  SnapshotWidget
 
 class MyMainWindow(QMainWindow):
     def __init__(self):
@@ -31,10 +31,21 @@ class MyMainWindow(QMainWindow):
         central_widget.setLayout(vlayout)
         self.setCentralWidget(central_widget)
 
-        self.dock_widget = QDockWidget("Snapshot View", self)
-        self.voice_widget = VoiceWidget()
-        self.dock_widget.setWidget(self.voice_widget)
+        self.dock_widget = QDockWidget("", self)
+        self.dock_widget.setWidget(self.create_information_widget())
         self.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
+
+    def create_information_widget(self):
+        tab_widget = QTabWidget()
+        self.voice_widget = VoiceWidget()
+        self.snapshot_widget = SnapshotWidget()
+        self.video_widget.image_updated_signal.connect(self.snapshot_widget.add_image)
+        tab_widget.addTab(self.snapshot_widget, "Snapshots")
+        tab_widget.addTab(self.voice_widget, "Chats")
+        tab_widget.setCurrentIndex(0)
+        return tab_widget
+
+
 
     def create_menu(self):
         menubar = self.menuBar()
