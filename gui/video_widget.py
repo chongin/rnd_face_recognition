@@ -5,14 +5,18 @@ import cv2
 
 import sys
 import os
-import  time
-import  datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../vision')))
 from vision_manager import VisionManager
 
+class FrameData:
+    def __init__(self, frame, predict_faces, q_img) -> None:
+        self.frame = frame
+        self.predict_faces = predict_faces
+        self.q_img = q_img
+
 class VideoThread(QThread):
-    image_updated_signal = Signal(QImage)
+    image_updated_signal = Signal(FrameData)
 
     def set_vision_manager(self, vision_manger):
         self.vision_manager = vision_manger
@@ -23,11 +27,14 @@ class VideoThread(QThread):
         while self.thread_active:
             ret, frame = self.video_capture.read()
             flip_frame = cv2.flip(frame, 1)
+            predict_faces = []
             if self.vision_manager:
-                self.vision_manager.excute_frame(flip_frame)
+                predict_faces = self.vision_manager.excute_frame(flip_frame)
 
             q_image = self.convert_cv_qt(flip_frame)
-            self.image_updated_signal.emit(q_image)
+
+            frame_data = FrameData(cv2.flip(frame, 1), predict_faces, q_image)
+            self.image_updated_signal.emit(frame_data)
 
         self.video_capture.release()
     
@@ -43,7 +50,8 @@ class VideoThread(QThread):
 
 
 class VideoWidget(QLabel):
-    image_updated_signal = Signal(QImage)
+    face_data_signal = Signal(tuple)
+  
     def __init__(self) -> None:
         super().__init__()
         self.vision_manager = VisionManager()
@@ -52,7 +60,7 @@ class VideoWidget(QLabel):
 
         self.video_thread.image_updated_signal.connect(self.update_image)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.last_time = datetime.datetime.now()
+
     def start(self):
         self.video_thread.start()
 
@@ -68,17 +76,14 @@ class VideoWidget(QLabel):
     def enable_object_dectection(self, flag: bool) -> None:
         self.vision_manager.enable_object_dectection(flag)
 
-    @Slot(QImage)
-    def update_image(self, image):
-        scaled_image = image.scaled(self.size(), Qt.KeepAspectRatio)
+    @Slot(FrameData)
+    def update_image(self, frame_data: FrameData):
+        scaled_image = frame_data.q_img .scaled(self.size(), Qt.KeepAspectRatio)
         #scaled_image = self.scale_image(image, self.size(), self.max_scale_factor)
-        self.setPixmap(QPixmap.fromImage(image))
-
-        current_time = datetime.datetime.now()
-        if (current_time - self.last_time).total_seconds() >= 5:
-        #if self.last_time:
-            self.image_updated_signal.emit(image)
-            self.last_time = current_time
+        self.setPixmap(QPixmap.fromImage(frame_data.q_img))
+        
+        if len(frame_data.predict_faces) > 0:
+            self.face_data_signal.emit((frame_data.frame, frame_data.predict_faces))
 
     def scale_image(self, image, target_size, max_scale_factor):
         width_ratio = target_size.width() / image.width()

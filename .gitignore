@@ -161,3 +161,4 @@ cython_debug/
 
 test/
 voice/secret.json
+gui/test

@@ -22,10 +22,12 @@ class VisionManager:
     def enable_object_dectection(self, flag: bool) -> None:
         self.object_detection_flag = flag
 
+    # should return face predict result: like this [('Chong In Ng', (76, 225, 166, 135))]
     def excute_frame(self, frame) -> None:
+        predict_faces = []
         if self.face_detection_flag:
-            predict_result = self.face_detector.predict_faces(frame=frame)
-            self.face_detector.draw_face_rectangle(frame, predict_result)
+            predict_faces = self.face_detector.predict_faces(frame=frame)
+            self.face_detector.draw_face_rectangle(frame, predict_faces)
 
         if self.emotion_detection_flag:
             predict_emotions = self.emotion_detector.predict_emotions(frame=frame)
@@ -35,6 +37,7 @@ class VisionManager:
             detect_objects = self.yolo_detector.detect_objects(frame=frame)
             self.yolo_detector.draw_objects(frame, detect_objects)
 
+        return predict_faces
          
             
             

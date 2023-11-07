@@ -1,9 +1,8 @@
-from PySide6.QtWidgets import *
-from PySide6.QtCore import *
-
 import sys
 import os
 
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../voice')))
 from voice_detector import VoiceDetector

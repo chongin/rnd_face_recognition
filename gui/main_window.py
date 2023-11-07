@@ -39,7 +39,7 @@ class MyMainWindow(QMainWindow):
         tab_widget = QTabWidget()
         self.voice_widget = VoiceWidget()
         self.snapshot_widget = SnapshotWidget()
-        self.video_widget.image_updated_signal.connect(self.snapshot_widget.add_image)
+        self.video_widget.face_data_signal.connect(self.snapshot_widget.add_face_image)
         tab_widget.addTab(self.snapshot_widget, "Snapshots")
         tab_widget.addTab(self.voice_widget, "Chats")
         tab_widget.setCurrentIndex(0)
