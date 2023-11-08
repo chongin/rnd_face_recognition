@@ -13,39 +13,42 @@ class MyMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.video_widget = VideoWidget()
+        self.voice_widget = VoiceWidget()
+        self.snapshot_widget = SnapshotWidget()
+
         self.create_menu()
         self.create_toolbar()
+        self.create_information_widget()
+       
+        self.create_central_widget()
+        
 
+    def create_central_widget(self):
         vlayout = QVBoxLayout()
         vlayout.setContentsMargins(0, 0, 0, 0)
         vlayout.setSpacing(5)
-
-        self.video_widget = VideoWidget()
         self.video_widget.setStyleSheet("background-color: black;")
         vlayout.addWidget(self.video_widget, 1)
-        control_widget = self.create_control_widget()
-        control_widget.setStyleSheet("background-color: #2E2E2E;")
-        vlayout.addWidget(control_widget, 0)
+        self.control_widget = self.create_control_widget()
+        self.control_widget.setStyleSheet("background-color: #2E2E2E;")
+        self.control_widget.setEnabled(False)
+        vlayout.addWidget(self.control_widget, 0)
 
         central_widget = QWidget()
         central_widget.setLayout(vlayout)
         self.setCentralWidget(central_widget)
 
-        self.dock_widget = QDockWidget("", self)
-        self.dock_widget.setWidget(self.create_information_widget())
-        self.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
-
     def create_information_widget(self):
         tab_widget = QTabWidget()
-        self.voice_widget = VoiceWidget()
-        self.snapshot_widget = SnapshotWidget()
-        self.video_widget.face_data_signal.connect(self.snapshot_widget.add_face_image)
         tab_widget.addTab(self.snapshot_widget, "Snapshots")
         tab_widget.addTab(self.voice_widget, "Chats")
         tab_widget.setCurrentIndex(0)
-        return tab_widget
-
-
+        self.video_widget.face_data_signal.connect(self.snapshot_widget.add_face_image)
+        
+        self.dock_widget = QDockWidget("", self)
+        self.dock_widget.setWidget(tab_widget)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
 
     def create_menu(self):
         menubar = self.menuBar()
@@ -77,13 +80,9 @@ class MyMainWindow(QMainWindow):
         self.object_cb = ActionCheckBox("Object Detection")
         self.voice_cb = ActionCheckBox("Voice Detection")
         self.all_cb = ActionCheckBox("All Detections")
-        
-        self.face_cb.toggled.connect(self.face_detection_toggle)
-        self.emotion_cb.toggled.connect(self.emotion_detection_toggle)
-        self.object_cb.toggled.connect(self.object_detection_toggle)
-        self.voice_cb.toggled.connect(self.voice_detection_toggle)
-        self.all_cb.toggled.connect(self.all_detection_toggle)
 
+        self.init_checkboxes_state()
+       
         hlayout = QHBoxLayout()
 
         hlayout.addItem(QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Minimum))
@@ -102,14 +101,30 @@ class MyMainWindow(QMainWindow):
         widget.setLayout(hlayout)
         return widget
 
+    def init_checkboxes_state(self):
+        self.face_cb.setChecked(self.video_widget.is_enable_face_dectection())
+        self.emotion_cb.setChecked(self.video_widget.is_enable_emotion_detection())
+        self.object_cb.setChecked(self.video_widget.is_enable_object_dectection())
+        self.voice_cb.setChecked(self.voice_widget.is_enable_voice_detection())
+        self.update_all_checkbox_state()
+        
+        self.face_cb.toggled.connect(self.face_detection_toggle)
+        self.emotion_cb.toggled.connect(self.emotion_detection_toggle)
+        self.object_cb.toggled.connect(self.object_detection_toggle)
+        self.voice_cb.toggled.connect(self.voice_detection_toggle)
+        self.all_cb.toggled.connect(self.all_detection_toggle)
+
+        
     def toggle_snapshot_dock(self):
         self.dock_widget.setHidden(not self.dock_widget.isHidden())
 
     def start_clicked(self):
         self.video_widget.start()
+        self.control_widget.setEnabled(True)
 
     def stop_clicked(self):
         self.video_widget.stop()
+        self.control_widget.setEnabled(False)
 
     def face_detection_toggle(self):
         print("face_detection_toggle")

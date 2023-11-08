@@ -37,13 +37,16 @@ class EmotionDetector:
             'Neutral': "You're keeping it cool today!",
             'None': "Emotion detection? I'm on vacation!"
         }
+        self.drawing_rectange = False
 
+    def enable_rectangle(self, flag: bool) -> None:
+        self.drawing_rectange = flag
+    
     def predict_emotions(self, frame):
         emotions = self.detetor.detect_emotions(frame)
         filter_emotions = self._filter_highest_emotion(emotions)
         return filter_emotions
 
-# [{'box': [547, 103, 304, 370], 'emotions': {'angry': 0.22, 'disgust': 0.0, 'fear': 0.44, 'happy': 0.0, 'sad': 0.14, 'surprise': 0.0, 'neutral': 0.18}}]
     def _filter_highest_emotion(self, detect_emotions):
         for item in detect_emotions:
             emotions = item['emotions']
@@ -65,7 +68,9 @@ class EmotionDetector:
                 emotion_name = self.emotion_smoothing.get_smoothed_emotion()
             
             emotion_hint = self.emotion_hints[emotion_name]
-            # cvzone.cornerRect(frame, (x, y, w, h))
+            if self.drawing_rectange:
+                cvzone.cornerRect(frame, (x, y, w, h))
+
             cvzone.putTextRect(
                 frame,
                 emotion_hint,

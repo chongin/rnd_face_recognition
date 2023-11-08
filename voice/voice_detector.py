@@ -17,6 +17,9 @@ class VoiceDetector:
         self.text_to_speech_cli = WSClient(Configure.instance().wsserver_url())
         self.text_to_speech_cli.set_handle_message_cb(self.handle_message_from_server)
 
+    def is_running(self):
+        return self.speech_to_text.is_running()
+
     def set_callback(self, callback):
         self.callback = callback
 

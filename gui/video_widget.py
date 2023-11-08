@@ -18,6 +18,10 @@ class FrameData:
 class VideoThread(QThread):
     image_updated_signal = Signal(FrameData)
 
+    def __init__(self):
+        super().__init__()
+        self.vision_manager = None
+
     def set_vision_manager(self, vision_manger):
         self.vision_manager = vision_manger
 
@@ -75,6 +79,15 @@ class VideoWidget(QLabel):
 
     def enable_object_dectection(self, flag: bool) -> None:
         self.vision_manager.enable_object_dectection(flag)
+
+    def is_enable_emotion_detection(self) -> bool:
+        return self.vision_manager.is_enable_emotion_detection()
+    
+    def is_enable_face_dectection(self) -> bool:
+        return self.vision_manager.is_enable_face_dectection()
+    
+    def is_enable_object_dectection(self) -> bool:
+        return self.vision_manager.is_enable_object_dectection()
 
     @Slot(FrameData)
     def update_image(self, frame_data: FrameData):

@@ -15,13 +15,24 @@ class VisionManager:
 
     def enable_emotion_dectection(self, flag: bool) -> None:
         self.emotion_detection_flag = flag
+        self.emotion_detector.enable_rectangle(not self.face_detection_flag)
 
     def enable_face_dectection(self, flag: bool) -> None:
         self.face_detection_flag = flag
+        self.emotion_detector.enable_rectangle(not self.face_detection_flag)
 
     def enable_object_dectection(self, flag: bool) -> None:
         self.object_detection_flag = flag
 
+    def is_enable_emotion_detection(self) -> bool:
+        return self.emotion_detection_flag
+    
+    def is_enable_face_dectection(self) -> bool:
+        return self.face_detection_flag
+    
+    def is_enable_object_dectection(self) -> bool:
+        return self.object_detection_flag
+    
     # should return face predict result: like this [('Chong In Ng', (76, 225, 166, 135))]
     def excute_frame(self, frame) -> None:
         predict_faces = []

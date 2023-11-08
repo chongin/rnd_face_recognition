@@ -50,11 +50,11 @@ class ImageDelegate(QStyledItemDelegate):
             text_color = Qt.green
 
             painter.setPen(QColor(text_color))
-            painter.drawText(option.rect, Qt.AlignTop | Qt.AlignHCenter, image_data.name)
+            painter.drawText(option.rect, Qt.AlignTop | Qt.AlignLeft, image_data.name) # AlignHCenter
             painter.drawText(option.rect, Qt.AlignBottom | Qt.AlignRight, image_data.timestamp)
 
     def sizeHint(self, option, index):
-        return QSize(200, 120)
+        return QSize(250, 150)
 
 class ImageListView(QListView):
     def __init__(self, model, delegate) -> None:
@@ -70,7 +70,7 @@ class SnapshotWidget(QWidget):
         self.model = ImageListModel()
         self.delegate = ImageDelegate()
         self.image_list_view = ImageListView(self.model, self.delegate)
-        self.image_list_view.setMinimumWidth(210)
+        self.image_list_view.setMinimumWidth(260)
         vlayout = QVBoxLayout()
         vlayout.addWidget(self.image_list_view)
         vlayout.setContentsMargins(0, 0, 0, 0)

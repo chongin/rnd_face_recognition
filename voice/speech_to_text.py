@@ -20,11 +20,14 @@ class SpeechToText:
         self.stream = None
         self.URL = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
         self.auth_key = Configure.instance().auth_key()
-        self.running = True
+        self.running = False
         self.callback = None
         self._ws_cli = WSClient(self.URL, header={"Authorization": self.auth_key})
         self._ws_cli.set_handle_message_cb(self.handle_message)
 
+    def is_running(self):
+        return self.running
+    
     def handle_message(self, message):
         json_result = json.loads(message)
         if json_result['message_type'] != 'FinalTranscript':

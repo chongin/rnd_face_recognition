@@ -13,7 +13,10 @@ class VoiceThread(QThread):
 
     def __init__(self):
         super().__init__()
-        self.voice_detector = VoiceDetector()
+        self.voice_detector = None
+
+    def set_voice_detector(self, voice_detector):
+        self.voice_detector = voice_detector
         self.voice_detector.set_callback(self.handle_text)
 
     def run(self):
@@ -33,7 +36,9 @@ class VoiceThread(QThread):
 class VoiceWidget(QWidget):
     def __init__(self) -> None:
         super().__init__()
+        self.voice_detector = VoiceDetector()
         self.voice_thread = VoiceThread()
+        self.voice_thread.set_voice_detector(self.voice_detector)
         self.voice_thread.text_updated_signal.connect(self.update_text)
 
         self.text_edit = QTextEdit()
@@ -43,7 +48,9 @@ class VoiceWidget(QWidget):
         vlayout.addWidget(self.text_edit)
         self.setLayout(vlayout)
 
-  
+    def is_enable_voice_detection(self):
+        return self.voice_detector.is_running()
+
     def start(self):
         self.voice_thread.start()
         print("Started voice thread")
