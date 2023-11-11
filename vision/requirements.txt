@@ -1,0 +1,106 @@
+sudo apt update
+sudo apt upgrade
+sudo apt install python3-pip
+pip install PySide6
+
+
+sudo apt-get install python3.8-venv
+python3.8 -m venv env3.8
+source env3.8/bin/activate
+
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
+
+sudo update-alternatives --config python3
+
+echo "alias python=/usr/bin/python3" >> ~/.bashrc
+echo "alias pip=/usr/bin/pip3" >> ~/.bashrc
+
+source ~/.bashrc 
+
+
+# update python version:
+https://cloudbytes.dev/snippets/upgrade-python-to-latest-version-on-ubuntu-linux
+
+
+# download pyside source_code:
+
+https://download.qt.io/official_releases/qt/6.6/6.6.0/single/
+
+# use pyside6.4.0
+curl -O -L https://download.qt.io/archive/qt/6.4/6.4.0/single/qt-everywhere-src-6.4.0.tar.xz
+
+
+
+# build from source code(arch linux):
+https://doc.qt.io/qt-6/linux-building.html
+
+
+# build from source code(jetson orin)
+https://bugreports.qt.io/browse/PYSIDE-2156?gerritIssueStatus=All
+
+
+# csdn about jetson nano install by source code:
+https://blog.csdn.net/OTZ_2333/article/details/129618756
+
+https://gitlab.com/-/snippets/2432339
+
+
+# cmake github
+https://github.com/Kitware/CMake/tree/v3.24.4
+
+https://askubuntu.com/questions/1126893/how-to-install-openssl-1-1-1-and-libssl-package
+
+Error:
+-- Looking for gethostname - found
+-- Could NOT find OpenSSL, try to set the path to OpenSSL root folder in the system variable OPENSSL_ROOT_DIR (missing: OPENSSL_CRYPTO_LIBRARY OPENSSL_INCLUDE_DIR) 
+CMake Error at Utilities/cmcurl/CMakeLists.txt:591 (message):
+  Could not find OpenSSL.  Install an OpenSSL development package or
+  configure CMake with -DCMAKE_USE_OPENSSL=OFF to build without OpenSSL.
+
+
+# install cmake(make sure install openssl first)
+./bootstrap && make && sudo make install
+
+# check cmake version:
+cmake --version
+
+# use command to install openssl:
+sudo apt install libssl-dev
+
+# to find where is the openssl:
+openssl version -d
+OPENSSLDIR: "/usr/lib/ssl"
+
+# install gcc 8.5.0
+https://mirrors.ustc.edu.cn/gnu/gcc/gcc-8.5.0/
+
+# command:
+sudo apt-get install gcc-8 g++-8
+
+
+# set default gcc version:
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+
+# no need this command
+sudo update-alternatives --config gcc
+
+# check gcc version:
+gcc --version
+
+# install clang 
+# reference https://blog.csdn.net/OTZ_2333/article/details/129618756
+git clone -b llvmorg-15.0.7 --depth=1 https://github.com/llvm/llvm-project.git
+cd llvm-project
+mkdir build
+cd build
+# cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm
+cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_RTTI=ON -DLLVM_ENABLE_EH=ON -G "Unix Makefiles" ../llvm
+make -j4
+sudo make install
+
+
+
+# install pyside-setup
+git clone https://code.qt.io/pyside/pyside-setup
+cd pyside-setup
+git checkout 6.4
