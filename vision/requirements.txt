@@ -180,6 +180,10 @@ git checkout 6.4
 python -m pip install -r requirements.txt
 python setup.py build --qtpaths=/usr/local/Qt-6.4.3/bin/qtpaths --ignore-git --parallel 4 --standalone
 
+python create_wheels.py
+cd dist_new
+pip install ./*whl
+
 
 # pyinstaller complie wheel has problem.
 # need to download pyinstaller
@@ -196,6 +200,13 @@ cd /usr/local/bin
 sudo cp /usr/bin/strip .
 
 
+and you should install this library otherwise, run python setup.py build pyside setup will raise cannot
+find the python3.8.so
+
+sudo apt-get install libpython3.8-dev
+
+
+
 sudo apt update
 sudo apt install gcc-9 g++-9
 
@@ -205,6 +216,7 @@ https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
 
 # setup gcc-9
 # use python3.8 error, change it back to 3.6
+#(if you don't change it back, it cannot run this command: sudo add-apt-repository ppa:ubuntu-toolchain-r/test)
 
 sudo update-alternatives --config python3    
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
