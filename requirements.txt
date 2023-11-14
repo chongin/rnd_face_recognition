@@ -1,0 +1,18 @@
+numpy=1.24.4
+dlib=19.24.2
+face_recognition
+fer
+ultralytics
+scikit-learn
+cvzone
+tensorflow
+# websocket
+websocket-client
+websockets
+pyaudio #( need to install this first: sudo apt-get install portaudio19-dev)
+pyttsx3 #(sudo apt-get install espeak)
+rel
+
+sudo -H pip3 install -U jetson-stats
+
+pip install --upgrade distro-info

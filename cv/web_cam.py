@@ -8,6 +8,7 @@ import signal
 from functools import partial
 import traceback
 
+import torch
 import cv2
 from vision_manager import VisionManager
 from logger import Logger

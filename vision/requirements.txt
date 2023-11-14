@@ -228,3 +228,20 @@ sudo update-alternatives --config gcc
 
 #after upgrade to gcc9, then I can solve transform_reduce is not a namespace std issue.
 
+
+# install on jetson nano
+
+# link: https://medium.com/@ageitgey/build-a-hardware-based-face-recognition-system-for-150-with-the-nvidia-jetson-nano-and-python-a25cb8c891fd
+
+sudo apt-get install python3-pip cmake libopenblas-dev liblapack-dev libjpeg-dev
+
+git clone https://github.com/JetsonHacksNano/installSwapfile
+./installSwapfile/installSwapfile.sh
+
+
+# numpy default version is not work, should upgrade it
+sudo python3 -m pip uninstall numpy  # Successfully uninstalled numpy-1.13.3
+sudo -H python3 -m pip install numpy   # version should be Successfully installed numpy-1.24.4
+
+# check ther version
+python3 -c "import numpy; print(numpy.__version__)"

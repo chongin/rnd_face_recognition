@@ -4,6 +4,7 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 
+import torch
 from video_widget import VideoWidget
 from action_checkbox import ActionCheckBox
 from voice_widget import VoiceWidget
@@ -180,7 +181,8 @@ def main():
     app = QApplication(sys.argv)
     window = MyMainWindow()
     width, height = app.primaryScreen().size().toTuple()
-    window.resize(width, height)
+    #window.resize(width, height)
+    window.resize(1440, 900)
     window.show()
     sys.exit(app.exec_())
 
