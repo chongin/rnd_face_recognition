@@ -1,17 +1,17 @@
 
 from face_recognition_knn import FaceRecognitionKNN
-from emotion_detector import EmotionDetector
+#from emotion_detector import EmotionDetector
 from yolo_detector import  YoloDetector
 
 
 class VisionManager:
     def __init__(self) -> None:
-        self.emotion_detector = EmotionDetector()
+        # self.emotion_detector = EmotionDetector()
         self.yolo_detector = YoloDetector()
         self.face_detector = FaceRecognitionKNN()
         self.emotion_detection_flag = False
         self.face_detection_flag = True
-        self.object_detection_flag = False
+        self.object_detection_flag = True
 
     def enable_emotion_dectection(self, flag: bool) -> None:
         self.emotion_detection_flag = flag
@@ -21,8 +21,8 @@ class VisionManager:
         self.face_detection_flag = flag
         self.emotion_detector.enable_rectangle(not self.face_detection_flag)
 
-    def enable_object_dectection(self, flag: bool) -> None:
-        self.object_detection_flag = flag
+    # def enable_object_dectection(self, flag: bool) -> None:
+    #     self.object_detection_flag = flag
 
     def is_enable_emotion_detection(self) -> bool:
         return self.emotion_detection_flag
@@ -40,9 +40,9 @@ class VisionManager:
             predict_faces = self.face_detector.predict_faces(frame=frame)
             self.face_detector.draw_face_rectangle(frame, predict_faces)
 
-        if self.emotion_detection_flag:
-            predict_emotions = self.emotion_detector.predict_emotions(frame=frame)
-            self.emotion_detector.draw_emotion_rectangle(frame, predict_emotions)
+        # if self.emotion_detection_flag:
+        #     predict_emotions = self.emotion_detector.predict_emotions(frame=frame)
+        #     self.emotion_detector.draw_emotion_rectangle(frame, predict_emotions)
 
         if self.object_detection_flag:
             detect_objects = self.yolo_detector.detect_objects(frame=frame)
