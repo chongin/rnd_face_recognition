@@ -7,7 +7,7 @@ from yolo_detector import  YoloDetector
 class VisionManager:
     def __init__(self) -> None:
         # self.emotion_detector = EmotionDetector()
-        self.yolo_detector = YoloDetector()
+        #self.yolo_detector = YoloDetector()
         self.face_detector = FaceRecognitionKNN()
         self.emotion_detection_flag = False
         self.face_detection_flag = True
@@ -44,9 +44,9 @@ class VisionManager:
         #     predict_emotions = self.emotion_detector.predict_emotions(frame=frame)
         #     self.emotion_detector.draw_emotion_rectangle(frame, predict_emotions)
 
-        if self.object_detection_flag:
-            detect_objects = self.yolo_detector.detect_objects(frame=frame)
-            self.yolo_detector.draw_objects(frame, detect_objects)
+        # if self.object_detection_flag:
+        #     detect_objects = self.yolo_detector.detect_objects(frame=frame)
+        #     self.yolo_detector.draw_objects(frame, detect_objects)
 
         return predict_faces
          

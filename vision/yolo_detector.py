@@ -9,7 +9,7 @@ from utils.util import Util
 class YoloDetector:
     def __init__(self):
         current_directory = Util.get_current_directory_of_file(__file__)
-        self.model = YOLO(f"{current_directory}/yolo_weights/yolov8l.pt")
+        self.model = YOLO(f"{current_directory}/yolo_weights/yolov8n.pt")
         self.class_names = self.model.names
 
     def detect_objects(self, frame):

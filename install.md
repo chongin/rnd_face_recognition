@@ -88,3 +88,133 @@ numpy already is the latest one: 1.24.4, but it still raise this error
 should update: pip install --upgrade h5py
 
 ```
+
+# install cmake
+```
+download from https://cmake.org/download/
+cd /usr
+sudo tar --strip-components=1 -xzf /home/jetson/Downloads/cmake-3.27.8-linux-aarch64.tar.gz
+cmake --version
+```
+
+# install gcc-9
+```
+sudo apt install gcc-9 g++-9
+sudo update-alternatives --config gcc
+
+or sudo apt install gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11 g++-12 gcc-12 g++-13 gcc-13
+```
+
+# install clang
+```
+sudo apt install clang
+
+```
+
+# install qt dependencies
+```
+sudo apt install -y \
+  build-essential \
+  curl \
+  git \
+  libfontconfig-dev \
+  libfreetype-dev \
+  libglib2.0-dev \
+  libgl-dev \
+  libgl1-mesa-dev \
+  libice-dev \
+  libsm-dev \
+  libssl-dev \
+  libx11-dev \
+  libx11-xcb-dev \
+  libxcb1-dev \
+  libxcb-glx0-dev \
+  libxcb-icccm4-dev \
+  libxcb-image0-dev \
+  libxcb-xinput-dev \
+  libxcb-keysyms1-dev \
+  libxcb-randr0-dev \
+  libxcb-render-util0-dev \
+  libxcb-render0-dev \
+  libxcb-shape0-dev \
+  libxcb-shm0-dev \
+  libxcb-sync-dev \
+  libxcb-util-dev \
+  libxcb-xfixes0-dev \
+  libxcb-xinerama0-dev \
+  libxcb-xinput-dev \
+  libxcb-xkb-dev \
+  libxext-dev \
+  libxfixes-dev \
+  libxi-dev \
+  libxkbcommon-dev \
+  libxkbcommon-x11-dev \
+  libxrender-dev \
+  ninja-build
+```
+
+# download qt
+```
+https://download.qt.io/archive/qt/6.4/6.4.3/single/
+tar -xf qt-everywhere-src-6.4.3.tar.xz
+
+cd qt-everywhere-src-6.4.3
+mkdir build
+cd build
+../configure
+cmake --build . --parallel 2
+sudo cmake --install .
+
+rememeber to use set gcc and g++ version to 9
+sudo update-alternatives --config gcc
+sudo update-alternatives --config g++
+```
+
+# install pyinstaller
+```
+first need to install pyinstaller
+git clone https://github.com/pyinstaller/pyinstaller
+cd pyinstaller, then cd bootloader
+python3 ./waf distclean all
+pip install . 
+
+at last you need to copy strip
+cd /usr/local/bin
+sudo cp /usr/bin/strip .
+
+```
+
+# install pyside-setup
+```
+have to install pyinstaller first.
+https://download.qt.io/official_releases/QtForPython/shiboken6/PySide6-6.4.3-src/
+
+https://github.com/qtproject/pyside-pyside-setup.git
+git clone https://code.qt.io/pyside/pyside-setup
+cd pyside-setup
+git checkout 6.4
+
+change requirements.txt: pyinstaller==3.6 => pyinstaller>=3.6
+python -m pip install -r requirements.txt
+python setup.py build --qtpaths=/usr/local/Qt-6.4.3/bin/qtpaths --ignore-git --parallel 4 --standalone
+
+python setup.py build --qtpaths=/usr/local/Qt-6.6.0/bin/qtpaths --ignore-git --parallel 4 --standalone
+
+python create_wheels.py
+cd dist_new
+pip install ./*whl
+
+
+```
+
+# fix error:  "/usr/lib/llvm-10/lib/libclangBasic.a"
+
+```
+when in configuration qt met this issue
+
+
+sudo apt install clang libclang-dev
+
+
+
+```
