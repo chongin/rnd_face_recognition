@@ -27,6 +27,7 @@ class WebCam:
     def run(self):
         while self.running:
             ret, frame = self.video_capture.read()
+            print("Width: %d, Height: %d, FPS: %d" % (self.video_capture.get(3), self.video_capture.get(4), self.video_capture.get(5)))
             if ret:
                 flip_frame = cv2.flip(frame, 1)
                 self.vision_manager.excute_frame(flip_frame)

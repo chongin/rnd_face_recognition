@@ -28,11 +28,19 @@ print("Before device type:", model.device.type)
 # print("After device type:", model.device.type)
 
 
+img = cv2.imread("/home/jetson/fer/justin.jpg")
+
+
+
 video_capture = cv2.VideoCapture(0)
+
 
 running = True
 while running:
     ret, frame = video_capture.read()
+    print("Width: %d, Height: %d, FPS: %d" % (video_capture.get(3), video_capture.get(4), video_capture.get(5)))
+    detector = FER()
+    print(detector.detect_emotions(img))
     if ret:
         flip_frame = cv2.flip(frame, 1)
         results = model(flip_frame, stream=True)

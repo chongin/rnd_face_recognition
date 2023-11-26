@@ -4,10 +4,10 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 
-import torch
+
 from video_widget import VideoWidget
 from action_checkbox import ActionCheckBox
-from voice_widget import VoiceWidget
+# from voice_widget import VoiceWidget
 from snapshot_widget import  SnapshotWidget
 
 class MyMainWindow(QMainWindow):
@@ -15,7 +15,7 @@ class MyMainWindow(QMainWindow):
         super().__init__()
 
         self.video_widget = VideoWidget()
-        self.voice_widget = VoiceWidget()
+        # self.voice_widget = VoiceWidget()
         self.snapshot_widget = SnapshotWidget()
 
         self.create_menu()
@@ -43,7 +43,7 @@ class MyMainWindow(QMainWindow):
     def create_information_widget(self):
         tab_widget = QTabWidget()
         tab_widget.addTab(self.snapshot_widget, "Snapshots")
-        tab_widget.addTab(self.voice_widget, "Chats")
+        # tab_widget.addTab(self.voice_widget, "Chats")
         tab_widget.setCurrentIndex(0)
         self.video_widget.face_data_signal.connect(self.snapshot_widget.add_face_image)
         
@@ -79,7 +79,7 @@ class MyMainWindow(QMainWindow):
         self.face_cb = ActionCheckBox("Face Detection")
         self.emotion_cb = ActionCheckBox("Emotion Detection")
         self.object_cb = ActionCheckBox("Object Detection")
-        self.voice_cb = ActionCheckBox("Voice Detection")
+        # self.voice_cb = ActionCheckBox("Voice Detection")
         self.all_cb = ActionCheckBox("All Detections")
 
         self.init_checkboxes_state()
@@ -92,8 +92,8 @@ class MyMainWindow(QMainWindow):
         hlayout.addWidget(self.emotion_cb)
         hlayout.addItem(QSpacerItem(20, 40, QSizePolicy.Fixed, QSizePolicy.Minimum))
         hlayout.addWidget(self.object_cb)
-        hlayout.addItem(QSpacerItem(20, 40, QSizePolicy.Fixed, QSizePolicy.Minimum))
-        hlayout.addWidget(self.voice_cb)
+        # hlayout.addItem(QSpacerItem(20, 40, QSizePolicy.Fixed, QSizePolicy.Minimum))
+        # hlayout.addWidget(self.voice_cb)
         hlayout.addItem(QSpacerItem(20, 40, QSizePolicy.Fixed, QSizePolicy.Minimum))
         hlayout.addWidget(self.all_cb)
         hlayout.addItem(QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Minimum))
@@ -106,13 +106,13 @@ class MyMainWindow(QMainWindow):
         self.face_cb.setChecked(self.video_widget.is_enable_face_dectection())
         self.emotion_cb.setChecked(self.video_widget.is_enable_emotion_detection())
         self.object_cb.setChecked(self.video_widget.is_enable_object_dectection())
-        self.voice_cb.setChecked(self.voice_widget.is_enable_voice_detection())
+        # self.voice_cb.setChecked(self.voice_widget.is_enable_voice_detection())
         self.update_all_checkbox_state()
         
         self.face_cb.toggled.connect(self.face_detection_toggle)
         self.emotion_cb.toggled.connect(self.emotion_detection_toggle)
         self.object_cb.toggled.connect(self.object_detection_toggle)
-        self.voice_cb.toggled.connect(self.voice_detection_toggle)
+        # self.voice_cb.toggled.connect(self.voice_detection_toggle)
         self.all_cb.toggled.connect(self.all_detection_toggle)
 
         
@@ -142,33 +142,33 @@ class MyMainWindow(QMainWindow):
         self.video_widget.enable_object_dectection(self.object_cb.isChecked())
         self.update_all_checkbox_state()
 
-    def voice_detection_toggle(self):
-        print("voice_detection_toggle")
-        self.update_all_checkbox_state()
-        if self.voice_cb.isChecked():
-            self.voice_widget.start()
-        else:
-            self.voice_widget.stop()
+    # def voice_detection_toggle(self):
+    #     print("voice_detection_toggle")
+    #     self.update_all_checkbox_state()
+        # if self.voice_cb.isChecked():
+        #     self.voice_widget.start()
+        # else:
+        #     self.voice_widget.stop()
 
     def all_detection_toggle(self):
         all_checked = self.all_cb.isChecked()
         self.face_cb.setChecked(all_checked)
         self.emotion_cb.setChecked(all_checked)
         self.object_cb.setChecked(all_checked)
-        self.voice_cb.setChecked(all_checked)
+        # self.voice_cb.setChecked(all_checked)
 
     def update_all_checkbox_state(self):
         # Check the states of all other checkboxes
         face_checked = self.face_cb.isChecked()
         emotion_checked = self.emotion_cb.isChecked()
         object_checked = self.object_cb.isChecked()
-        voice_checked = self.voice_cb.isChecked()
+        # voice_checked = self.voice_cb.isChecked()
 
         self.all_cb.blockSignals(True)
 
-        if face_checked and emotion_checked and object_checked and voice_checked:
+        if face_checked and emotion_checked and object_checked: # and voice_checked:
             self.all_cb.setChecked(True)
-        elif not face_checked and not emotion_checked and not object_checked and not voice_checked:
+        elif not face_checked and not emotion_checked and not object_checked: # and not voice_checked:
             self.all_cb.setChecked(False)
         else:
             self.all_cb.setCheckState(Qt.PartiallyChecked)

@@ -56,6 +56,18 @@ python3 -m venv --system-site-packages venv2
 python3 -m venv env
 source env/bin/activate
 ```
+# install dlib
+```
+reference this link: https://medium.com/@ageitgey/build-a-hardware-based-face-recognition-system-for-150-with-the-nvidia-jetson-nano-and-python-a25cb8c891fd
+
+test dlib support cuda or not
+
+python
+>>> import dlib
+>>> dlib.DLIB_USE_CUDA
+
+the output should be true if it support cuda.
+```
 
 # install Yolo V8
 ```
@@ -89,6 +101,11 @@ should update: pip install --upgrade h5py
 
 ```
 
+# fix error: qt.qpa.plugin: Could not find the Qt platform plugin "xcb" in ""
+```
+fixed it by install pyside-setup 6.4.3,and it doesn't support 6.6.0
+
+```
 # install cmake
 ```
 download from https://cmake.org/download/
@@ -103,6 +120,45 @@ sudo apt install gcc-9 g++-9
 sudo update-alternatives --config gcc
 
 or sudo apt install gcc-9 g++-9 gcc-10 g++-10 gcc-11 g++-11 g++-12 gcc-12 g++-13 gcc-13
+
+
+
+install gcc-6.3
+
+reference url: https://askubuntu.com/questions/1229774/how-to-use-an-older-version-of-gcc
+
+echo "deb http://old-releases.ubuntu.com/ubuntu zesty main" | sudo tee /etc/apt/sources.list.d/zesty.list
+sudo apt-add-repository -r universe
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 1
+
+
+
+
+-- Looking for cuDNN install...
+-- Found cuDNN: /usr/lib/aarch64-linux-gnu/libcudnn.so
+-- Enabling CUDA support for dlib.  DLIB WILL USE CUDA, compute capabilities: 50
+
+
+
+
+
+it cannot support build for gcc-6.3, it should use gcc-7.5 to compile the dlib
+
+after change to gcc-7.5
+
+cd build
+run cmake then 
+make install
+
+then cd .. go to the dlib root folder
+sudo python3 setup.py install --set DLIB_USE_CUDA=1 --set USE_AVX_INSTRUCTIONS=1
+
+then test:
+import dlib
+dlib.DLIB_USE_CUDA
+
+it will show true
 ```
 
 # install clang
@@ -168,6 +224,9 @@ sudo cmake --install .
 rememeber to use set gcc and g++ version to 9
 sudo update-alternatives --config gcc
 sudo update-alternatives --config g++
+
+Debug Qt load error: qt.qpa.plugin: Could not find the Qt platform plugin "xcb" in ""
+export QT_DEBUG_PLUGINS=1
 ```
 
 # install pyinstaller
@@ -202,8 +261,8 @@ python setup.py build --qtpaths=/usr/local/Qt-6.6.0/bin/qtpaths --ignore-git --p
 
 python create_wheels.py
 cd dist_new
-pip install ./*whl
 
+pip3 install *.whl
 
 ```
 
