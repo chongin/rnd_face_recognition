@@ -1,8 +1,8 @@
 import sklearn
-import skimage
+# import skimage
 from face_recognition_knn import FaceRecognitionKNN
 # from emotion_detector import EmotionDetector
-# from yolo_detector import  YoloDetector
+from yolo_detector import  YoloDetector
 
 
 class VisionManager:
@@ -45,9 +45,9 @@ class VisionManager:
         #     predict_emotions = self.emotion_detector.predict_emotions(frame=frame)
         #     self.emotion_detector.draw_emotion_rectangle(frame, predict_emotions)
 
-        if self.object_detection_flag:
-            detect_objects = self.yolo_detector.detect_objects(frame=frame)
-            self.yolo_detector.draw_objects(frame, detect_objects)
+        # if self.object_detection_flag:
+        #     detect_objects = self.yolo_detector.detect_objects(frame=frame)
+        #     self.yolo_detector.draw_objects(frame, detect_objects)
 
         return predict_faces
          

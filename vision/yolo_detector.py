@@ -11,10 +11,10 @@ class YoloDetector:
         current_directory = Util.get_current_directory_of_file(__file__)
         self.model = YOLO(f"{current_directory}/yolo_weights/yolov8n.pt")
         self.class_names = self.model.names
-        self.threshold = 0.6
+        self.threshold = 0.5
 
     def detect_objects(self, frame):
-        results = self.model(frame, stream=True)
+        results = self.model(frame, conf=self.threshold, stream=True)
         print(f"detect objects by Yolo: {results}")
         return results
 
@@ -34,7 +34,8 @@ class YoloDetector:
             conf = math.ceil((box.conf[0] * 100)) / 100
             if conf < self.threshold:
                 print(f"{conf} is less than the threshold, so no need to draw it.")
-            cls = int(box.cls[0])
+                continue
 
+            cls = int(box.cls[0])
             cvzone.putTextRect(frame, f'{self.class_names[cls]} {conf}', (max(0, x1), max(35, y1)),
                                scale=0.7, thickness=1, offset=3)

@@ -164,3 +164,4 @@ voice/secret.json
 gui/test
 venv*
 test_code
+face/images/*
