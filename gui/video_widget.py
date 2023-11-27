@@ -28,6 +28,8 @@ class VideoThread(QThread):
     def run(self):
         self.thread_active = True
         self.video_capture = cv2.VideoCapture(0)
+        self.video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1440)
+        self.video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 900)
         while self.thread_active:
             ret, frame = self.video_capture.read()
             flip_frame = cv2.flip(frame, 1)
