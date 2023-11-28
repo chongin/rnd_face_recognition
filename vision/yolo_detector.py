@@ -15,7 +15,7 @@ class YoloDetector:
 
     def detect_objects(self, frame):
         results = self.model(frame, conf=self.threshold, stream=True)
-        print(f"detect objects by Yolo: {results}")
+        # print(f"detect objects by Yolo: {results}")
         return results
 
     def draw_objects(self, frame, results):

@@ -15,7 +15,7 @@ class FaceRecognitionKNN:
     def __init__(self) -> None:
         self.allowed_extenstions = {'png', 'jpg', 'jpeg'}
         current_directory = Util.get_current_directory_of_file(__file__)
-        self.train_dir = f"{current_directory}/models"
+        self.train_dir = f"{current_directory}/images"
         self.model_save_folder = f"{current_directory}/trained_models"
         self.model_name = 'trained_knn_model'
         self.knn_clf = None
@@ -55,7 +55,7 @@ class FaceRecognitionKNN:
                 distance_threshold=0.6,
                 n_neighbors=1
             )
-        Logger.debug(f"Predict faces, {predict_result}")
+        # Logger.debug(f"Predict faces, {predict_result}")
         return predict_result
 
     def draw_face_rectangle(self, frame, predict_result) -> None:
