@@ -274,6 +274,43 @@ when in configuration qt met this issue
 
 sudo apt install clang libclang-dev
 
+```
 
 
+# make sure opencv support cuda
+```
+in jetson nano: the cv2 version: 4.8.0 is supported cuda
+use this command to check
+
+import cv2
+print(cv2.cuda.getCudaEnabledDeviceCount())
+
+it should greater than 0
+
+if you have other python-contrib version, make sure delete it first
+pip uninstall opencv-contrib-python==4.8.1.78
+
+
+how to build opencv so that it support cuda
+git clone https://github.com/opencv/opencv.git
+cd opencv
+mkdir build
+cd build
+
+# Configure OpenCV build with CUDA support
+cmake -D WITH_CUDA=ON -D WITH_CUDNN=ON -D CUDA_ARCH_BIN=7.2 ..
+
+# Build and install OpenCV
+make -j4
+sudo make install
+
+
+```
+
+# make sure pytroch support cuda
+```
+import torch
+torch.cuda.is_available()
+
+it should return True
 ```

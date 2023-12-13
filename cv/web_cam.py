@@ -25,8 +25,24 @@ class WebCam:
         self.vision_manager = VisionManager()
 
     def run(self):
+        # Create a GPU-based MOG2 background subtractor
+        mog2 = cv2.cuda.createBackgroundSubtractorMOG2()
+
+        # Create a CUDA stream
+        stream = cv2.cuda_Stream()
         while self.running:
             ret, frame = self.video_capture.read()
+
+            # Upload the frame to GPU
+            gpu_frame = cv2.cuda_GpuMat()
+            gpu_frame.upload(frame)
+
+            # Apply background subtraction on GPU with a learning rate and stream
+            gpu_fgmask = mog2.apply(gpu_frame, learningRate=0.01, stream=stream)
+
+            # Download the result from GPU to CPU if needed (not required for processing)
+            fgmask = gpu_fgmask.download()
+
             print("Width: %d, Height: %d, FPS: %d" % (self.video_capture.get(3), self.video_capture.get(4), self.video_capture.get(5)))
             if ret:
                 flip_frame = cv2.flip(frame, 1)

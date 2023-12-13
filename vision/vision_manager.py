@@ -15,9 +15,9 @@ class VisionManager:
 
         self.yolo_detector = YoloDetector()
         self.face_detector = FaceRecognitionKNN()
-        self.emotion_detection_flag = True
+        self.emotion_detection_flag = False
         self.face_detection_flag = True
-        self.object_detection_flag = True
+        self.object_detection_flag = False
 
     def enable_emotion_dectection(self, flag: bool) -> None:
         self.emotion_detection_flag = flag

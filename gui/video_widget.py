@@ -1,13 +1,17 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-import cv2
-
 import sys
 import os
 
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../vision')))
 from vision_manager import VisionManager
+
+
+import cv2
+
+
 
 class FrameData:
     def __init__(self, frame, predict_faces, q_img) -> None:
@@ -28,8 +32,8 @@ class VideoThread(QThread):
     def run(self):
         self.thread_active = True
         self.video_capture = cv2.VideoCapture(0)
-        self.video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1440)
-        self.video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 900)
+        self.video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
+        self.video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
         while self.thread_active:
             ret, frame = self.video_capture.read()
             flip_frame = cv2.flip(frame, 1)
